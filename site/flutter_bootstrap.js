@@ -33,13 +33,13 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"69c8c61792f04cc809dfef0c910414fb9afc06cd","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
+_flutter.buildConfig = {"engineRevision":"77e2e94772b6eb43759e34ed1ad7da4674e19cab","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
 
 
-const APP_VERSION = '1.2.66';
-const APP_BUILD_NUMBER = '73';
+const APP_VERSION = '1.2.67';
+const APP_BUILD_NUMBER = '75';
 const APP_VERSION_LABEL = `v${APP_VERSION}+${APP_BUILD_NUMBER}`;
-const APP_UPDATED_AT = '2026-07-22';
+const APP_UPDATED_AT = '2026-07-27';
 const RELOAD_DELAY_MS = 1200;
 const CURSOR_FRAME_SIZE = 128;
 const CURSOR_FRAME_COORDINATES = Array.from({length: 9}, (_, index) => {
@@ -109,6 +109,221 @@ const UPDATE_TARGET_SESSION_KEY = 'worcat-update-target';
 function resolveAppUrl(path) {
   return new URL(path, document.baseURI).toString();
 }
+
+function resolveBrowserTimezone() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Taipei';
+  } catch (_) {
+    return 'Asia/Taipei';
+  }
+}
+
+function toBase64UrlUint8Array(value) {
+  const normalized = `${value || ''}`.trim();
+  const padding = '='.repeat((4 - (normalized.length % 4)) % 4);
+  const base64 = (normalized + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const decoded = window.atob(base64);
+  return Uint8Array.from(decoded, (char) => char.charCodeAt(0));
+}
+
+function serializePushSubscription(subscription) {
+  if (!subscription) {
+    return null;
+  }
+
+  const json = typeof subscription.toJSON === 'function'
+    ? subscription.toJSON()
+    : {};
+  const keys = json.keys || {};
+
+  return {
+    endpoint: subscription.endpoint || '',
+    expirationTime:
+      subscription.expirationTime == null
+        ? null
+        : Number(subscription.expirationTime),
+    p256dh: keys.p256dh || '',
+    auth: keys.auth || '',
+  };
+}
+
+function createPushStatus({
+  supported,
+  permission,
+  subscription = null,
+  reason = null,
+}) {
+  return {
+    supported,
+    permission,
+    subscription,
+    timezoneName: resolveBrowserTimezone(),
+    reason,
+  };
+}
+
+async function ensurePushRegistration() {
+  const registration = await registerServiceWorker();
+  if (registration) {
+    return registration;
+  }
+  return navigator.serviceWorker.ready;
+}
+
+async function worcatPushGetStatus() {
+  const supported =
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    'Notification' in window;
+
+  if (!supported) {
+    return createPushStatus({
+      supported: false,
+      permission: 'unsupported',
+      reason: 'push_not_supported',
+    });
+  }
+
+  const permission = Notification.permission || 'default';
+
+  try {
+    const registration = await ensurePushRegistration();
+    const subscription = await registration.pushManager.getSubscription();
+    return createPushStatus({
+      supported: true,
+      permission,
+      subscription: serializePushSubscription(subscription),
+    });
+  } catch (error) {
+    return createPushStatus({
+      supported: true,
+      permission,
+      reason: error?.message || `${error}`,
+    });
+  }
+}
+
+async function worcatPushSubscribe(vapidPublicKey) {
+  const supported =
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    'Notification' in window;
+
+  if (!supported) {
+    return createPushStatus({
+      supported: false,
+      permission: 'unsupported',
+      reason: 'push_not_supported',
+    });
+  }
+
+  const trimmedKey = `${vapidPublicKey || ''}`.trim();
+  if (!trimmedKey) {
+    return createPushStatus({
+      supported: true,
+      permission: Notification.permission || 'default',
+      reason: 'push_public_key_missing',
+    });
+  }
+
+  let permission = Notification.permission || 'default';
+  if (permission !== 'granted') {
+    permission = await Notification.requestPermission();
+  }
+
+  if (permission !== 'granted') {
+    return createPushStatus({
+      supported: true,
+      permission,
+      reason: 'push_permission_not_granted',
+    });
+  }
+
+  const registration = await ensurePushRegistration();
+  let subscription = await registration.pushManager.getSubscription();
+
+  if (!subscription) {
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: toBase64UrlUint8Array(trimmedKey),
+    });
+  }
+
+  return createPushStatus({
+    supported: true,
+    permission,
+    subscription: serializePushSubscription(subscription),
+  });
+}
+
+async function worcatPushUnsubscribe() {
+  const supported =
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    'Notification' in window;
+
+  if (!supported) {
+    return createPushStatus({
+      supported: false,
+      permission: 'unsupported',
+      reason: 'push_not_supported',
+    });
+  }
+
+  const registration = await ensurePushRegistration();
+  const subscription = await registration.pushManager.getSubscription();
+  if (subscription) {
+    await subscription.unsubscribe();
+  }
+
+  return createPushStatus({
+    supported: true,
+    permission: Notification.permission || 'default',
+  });
+}
+
+function worcatPushBridge(action, vapidPublicKey, callbackName) {
+  const callback = window[callbackName];
+  if (typeof callback !== 'function') {
+    return;
+  }
+
+  const runner = async () => {
+    switch (action) {
+      case 'status':
+        return worcatPushGetStatus();
+      case 'subscribe':
+        return worcatPushSubscribe(vapidPublicKey);
+      case 'unsubscribe':
+        return worcatPushUnsubscribe();
+      default:
+        return createPushStatus({
+          supported: false,
+          permission: 'unsupported',
+          reason: 'push_bridge_unknown_action',
+        });
+    }
+  };
+
+  void runner()
+    .then((payload) => callback(JSON.stringify(payload)))
+    .catch((error) => {
+      callback(
+        JSON.stringify(
+          createPushStatus({
+            supported: false,
+            permission: 'unsupported',
+            reason: error?.message || `${error}`,
+          }),
+        ),
+      );
+    });
+}
+
+window.worcatPushGetStatus = worcatPushGetStatus;
+window.worcatPushSubscribe = worcatPushSubscribe;
+window.worcatPushUnsubscribe = worcatPushUnsubscribe;
+window.worcatPushBridge = worcatPushBridge;
 
 function setRuntimeMetadata() {
   document.documentElement.dataset.appVersion = APP_VERSION_LABEL;
