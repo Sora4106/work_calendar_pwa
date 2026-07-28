@@ -36,8 +36,8 @@ if (!window._flutter) {
 _flutter.buildConfig = {"engineRevision":"77e2e94772b6eb43759e34ed1ad7da4674e19cab","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
 
 
-const APP_VERSION = '1.2.74';
-const APP_BUILD_NUMBER = '82';
+const APP_VERSION = '1.2.75';
+const APP_BUILD_NUMBER = '83';
 const APP_VERSION_LABEL = `v${APP_VERSION}+${APP_BUILD_NUMBER}`;
 const APP_UPDATED_AT = '2026-07-28';
 const RELOAD_DELAY_MS = 1200;
