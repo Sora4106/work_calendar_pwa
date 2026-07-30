@@ -36,10 +36,12 @@ if (!window._flutter) {
 _flutter.buildConfig = {"engineRevision":"77e2e94772b6eb43759e34ed1ad7da4674e19cab","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
 
 
-const APP_VERSION = '1.2.80';
-const APP_BUILD_NUMBER = '86';
-const APP_VERSION_LABEL = `v${APP_VERSION}+${APP_BUILD_NUMBER}`;
-const APP_UPDATED_AT = '2026-07-28';
+const APP_VERSION_LABEL =
+  document.querySelector('meta[name="worcat:version"]')?.content?.trim() ||
+  'v0.0.0+0';
+const APP_UPDATED_AT =
+  document.querySelector('meta[name="worcat:updated-at"]')?.content?.trim() ||
+  'unknown';
 const RELOAD_DELAY_MS = 1200;
 const CURSOR_FRAME_SIZE = 128;
 const CURSOR_FRAME_COORDINATES = Array.from({length: 9}, (_, index) => {
