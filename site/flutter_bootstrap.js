@@ -105,7 +105,6 @@ let cursorLastClientY = null;
 let cursorEnabled = false;
 let cursorBootstrapArmed = false;
 let cursorInitializationPromise = null;
-const VERSION_CHECK_SESSION_KEY = 'worcat-version-check';
 const UPDATE_TARGET_SESSION_KEY = 'worcat-update-target';
 
 function resolveAppUrl(path) {
@@ -975,12 +974,6 @@ async function checkVersionManifest() {
     return;
   }
 
-  if (readSessionValue(VERSION_CHECK_SESSION_KEY) === APP_VERSION_LABEL) {
-    return;
-  }
-
-  writeSessionValue(VERSION_CHECK_SESSION_KEY, APP_VERSION_LABEL);
-
   const versionUrl = resolveAppUrl(`version.json?ts=${Date.now()}`);
   const response = await fetch(versionUrl, {
     cache: 'no-store',
@@ -1061,16 +1054,15 @@ function scheduleDeferredTask(task, timeoutMs = 80) {
 }
 
 function runStartupUpdateCheck(registration) {
-  void checkVersionManifest().catch((error) => {
-    console.debug('Version check skipped.', error);
-  });
-
   void registration?.update().catch((error) => {
     console.debug('Service worker update skipped.', error);
   });
 }
 
 setRuntimeMetadata();
+void checkVersionManifest().catch((error) => {
+  console.debug('Version check skipped.', error);
+});
 
 (async function bootstrap() {
   const registrationPromise = registerServiceWorker();
