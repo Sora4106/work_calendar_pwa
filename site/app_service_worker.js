@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = 'v1.2.94+102';
+const APP_VERSION = 'v1.2.96+104';
 const STATIC_CACHE = `worcat-static-${APP_VERSION}`;
 const RUNTIME_CACHE = `worcat-runtime-${APP_VERSION}`;
 const CACHE_PREFIX = 'worcat-';
