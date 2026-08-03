@@ -1,8 +1,12 @@
 'use strict';
 
-const APP_VERSION = 'v1.2.96+104';
+const APP_VERSION = 'v1.2.97+105';
 const STATIC_CACHE = `worcat-static-${APP_VERSION}`;
 const RUNTIME_CACHE = `worcat-runtime-${APP_VERSION}`;
+// Keep cat artwork between app-only releases. Bump this only when an image
+// under assets/cats is replaced so unchanged artwork never downloads again.
+const CAT_ASSET_REVISION = '2026-08-03';
+const CAT_IMAGE_CACHE = 'worcat-cat-images';
 const CACHE_PREFIX = 'worcat-';
 const BASE_URL = self.registration.scope;
 const SHELL_ASSETS = [
@@ -46,7 +50,8 @@ self.addEventListener('activate', (event) => {
             (key) =>
               key.startsWith(CACHE_PREFIX) &&
               key !== STATIC_CACHE &&
-              key !== RUNTIME_CACHE,
+              key !== RUNTIME_CACHE &&
+              key !== CAT_IMAGE_CACHE,
           )
           .map((key) => caches.delete(key)),
       );
@@ -84,6 +89,11 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(handleNavigation(request));
+    return;
+  }
+
+  if (url.pathname.includes('/assets/cats/')) {
+    event.respondWith(handleCatImageAsset(request));
     return;
   }
 
@@ -193,4 +203,25 @@ async function staleWhileRevalidate(request) {
     .catch(() => null);
 
   return cachedResponse ?? (await networkFetch) ?? Response.error();
+}
+
+function catImageCacheRequest(request) {
+  const keyUrl = new URL(request.url);
+  keyUrl.searchParams.set('__worcat_cat_rev', CAT_ASSET_REVISION);
+  return new Request(keyUrl.toString());
+}
+
+async function handleCatImageAsset(request) {
+  const cache = await caches.open(CAT_IMAGE_CACHE);
+  const cacheRequest = catImageCacheRequest(request);
+  const cachedResponse = await cache.match(cacheRequest);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  const response = await fetch(request, {cache: 'no-cache'});
+  if (response.ok) {
+    await cache.put(cacheRequest, response.clone());
+  }
+  return response;
 }

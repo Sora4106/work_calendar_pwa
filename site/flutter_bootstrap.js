@@ -425,7 +425,9 @@ async function clearWorcatCaches() {
   const keys = await caches.keys();
   await Promise.all(
     keys
-      .filter((key) => key.startsWith(CACHE_PREFIX))
+      .filter(
+        (key) => key.startsWith(CACHE_PREFIX) && key !== 'worcat-cat-images',
+      )
       .map((key) => caches.delete(key)),
   );
 }
