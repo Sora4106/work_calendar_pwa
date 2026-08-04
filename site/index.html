@@ -19,8 +19,8 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="application-name" content="worCat Work Calendar">
-  <meta name="worcat:version" content="v1.2.104+112">
-  <meta name="worcat:updated-at" content="2026-08-03">
+  <meta name="worcat:version" content="v1.2.105+113">
+  <meta name="worcat:updated-at" content="2026-08-04">
   <meta
     name="description"
     content="worCat Work Calendar is a Web PWA for calendar planning, ledger entries, schedules, and work tracking."
@@ -49,6 +49,12 @@
       cursor: var(--worcat-cursor) !important;
     }
 
+    /* Keep iOS from treating an edge swipe as browser back/forward. */
+    html,
+    body {
+      overscroll-behavior-x: none;
+    }
+
     input,
     textarea,
     select,
@@ -58,6 +64,48 @@
   </style>
 </head>
 <body>
+  <script>
+    (() => {
+      const edgeWidth = 56;
+      let edgeTouch = null;
+
+      document.addEventListener('touchstart', (event) => {
+        if (event.touches.length !== 1) {
+          edgeTouch = null;
+          return;
+        }
+
+        const touch = event.touches[0];
+        const startsAtEdge =
+          touch.clientX <= edgeWidth ||
+          touch.clientX >= window.innerWidth - edgeWidth;
+        edgeTouch = startsAtEdge
+          ? { x: touch.clientX, y: touch.clientY }
+          : null;
+      }, { passive: true, capture: true });
+
+      document.addEventListener('touchmove', (event) => {
+        if (!edgeTouch || event.touches.length !== 1) {
+          return;
+        }
+
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - edgeTouch.x;
+        const deltaY = touch.clientY - edgeTouch.y;
+        if (Math.abs(deltaX) <= Math.abs(deltaY) || Math.abs(deltaX) < 4) {
+          return;
+        }
+
+        // Prevent only the browser's horizontal edge navigation. Flutter
+        // still receives the touch stream and changes pages itself.
+        event.preventDefault();
+      }, { passive: false, capture: true });
+
+      const clearEdgeTouch = () => { edgeTouch = null; };
+      document.addEventListener('touchend', clearEdgeTouch, { passive: true, capture: true });
+      document.addEventListener('touchcancel', clearEdgeTouch, { passive: true, capture: true });
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
