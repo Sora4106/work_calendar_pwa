@@ -330,9 +330,14 @@ function setRuntimeMetadata() {
   document.documentElement.dataset.appVersion = APP_VERSION_LABEL;
   document.documentElement.dataset.appUpdatedAt = APP_UPDATED_AT;
   window.__WORCAT_APP_VERSION__ = APP_VERSION_LABEL;
+  window.worcatBootScreen?.setVersion(APP_VERSION_LABEL);
   if (readSessionValue(UPDATE_TARGET_SESSION_KEY) === APP_VERSION_LABEL) {
     removeSessionValue(UPDATE_TARGET_SESSION_KEY);
   }
+}
+
+function setBootStatus(message) {
+  window.worcatBootScreen?.setStatus(message);
 }
 
 function ensureUpdateToast() {
@@ -465,6 +470,7 @@ function queueReload(message, targetVersion = null) {
   if (targetVersion !== null) {
     writeSessionValue(UPDATE_TARGET_SESSION_KEY, targetVersion);
   }
+  setBootStatus(message);
   const toast = ensureUpdateToast();
   toast.textContent = message;
   toast.hidden = false;
@@ -481,6 +487,7 @@ async function queueFreshReload(message, targetVersion) {
 
   reloadQueued = true;
   writeSessionValue(UPDATE_TARGET_SESSION_KEY, targetVersion);
+  setBootStatus(message);
   const toast = ensureUpdateToast();
   toast.textContent = message;
   toast.hidden = false;
@@ -1062,6 +1069,7 @@ function runStartupUpdateCheck(registration) {
 }
 
 setRuntimeMetadata();
+setBootStatus('\u6b63\u5728\u6aa2\u67e5\u66f4\u65b0\uff0c\u6e96\u5099 worCat \u5de5\u4f5c\u6aaf...');
 void checkVersionManifest().catch((error) => {
   console.debug('Version check skipped.', error);
 });
@@ -1071,8 +1079,10 @@ void checkVersionManifest().catch((error) => {
 
   _flutter.loader.load({
     onEntrypointLoaded: async (engineInitializer) => {
+      setBootStatus('\u6b63\u5728\u555f\u52d5 worCat \u7cfb\u7d71...');
       const appRunner = await engineInitializer.initializeEngine();
       await appRunner.runApp();
+      window.worcatBootScreen?.complete();
 
       const registration = await registrationPromise;
       scheduleDeferredTask(() => runStartupUpdateCheck(registration), 120);
