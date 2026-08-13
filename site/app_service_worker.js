@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = 'v1.2.113+121';
+const APP_VERSION = 'v1.2.114+122';
 const STATIC_CACHE = `worcat-static-${APP_VERSION}`;
 const RUNTIME_CACHE = `worcat-runtime-${APP_VERSION}`;
 // Keep cat artwork between app-only releases. Bump this only when an image
