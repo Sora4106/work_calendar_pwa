@@ -18,8 +18,12 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
   <meta name="application-name" content="worCat Work Calendar">
-  <meta name="worcat:version" content="v1.2.119+127">
+  <meta name="worcat:version" content="v1.2.121+129">
   <meta name="worcat:updated-at" content="2026-08-14">
   <meta
     name="description"
@@ -38,6 +42,19 @@
   <style>
     :root {
       --worcat-cursor: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
     }
 
     html,
@@ -69,7 +86,13 @@
       display: grid;
       place-items: center;
       overflow: hidden;
-      padding: 24px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding:
+        max(20px, env(safe-area-inset-top))
+        max(20px, env(safe-area-inset-right))
+        max(20px, env(safe-area-inset-bottom))
+        max(20px, env(safe-area-inset-left));
       background:
         radial-gradient(circle at 16% 14%, rgba(243, 183, 93, 0.26), transparent 34%),
         radial-gradient(circle at 84% 78%, rgba(39, 139, 126, 0.22), transparent 38%),
@@ -119,6 +142,23 @@
       box-shadow: 0 24px 64px rgba(21, 70, 71, 0.18);
       backdrop-filter: blur(14px);
       text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .worcat-boot-card {
+        width: 100%;
+        padding: 34px 24px;
+        border-radius: 28px;
+      }
+
+      .worcat-boot-brand {
+        min-height: 82px;
+        margin-bottom: 22px;
+      }
+
+      .worcat-boot-logo {
+        width: min(82vw, 300px);
+      }
     }
 
     .worcat-boot-brand {
