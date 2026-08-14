@@ -1,11 +1,11 @@
 'use strict';
 
-const APP_VERSION = 'v1.2.117+125';
+const APP_VERSION = 'v1.2.118+126';
 const STATIC_CACHE = `worcat-static-${APP_VERSION}`;
 const RUNTIME_CACHE = `worcat-runtime-${APP_VERSION}`;
 // Keep cat artwork between app-only releases. Bump this only when an image
 // under assets/cats is replaced so unchanged artwork never downloads again.
-const CAT_ASSET_REVISION = '2026-08-03';
+const CAT_ASSET_REVISION = '2026-08-14-cashflow-v3';
 const CAT_IMAGE_CACHE = 'worcat-cat-images';
 const CACHE_PREFIX = 'worcat-';
 const BASE_URL = self.registration.scope;
@@ -97,6 +97,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  if (isVersionCriticalAsset(url.pathname)) {
+    event.respondWith(networkFirstVersionedAsset(request));
+    return;
+  }
+
   if (shouldHandleAsset(url.pathname)) {
     event.respondWith(staleWhileRevalidate(request));
   }
@@ -168,6 +173,36 @@ function shouldHandleAsset(pathname) {
     pathname.includes('/canvaskit/') ||
     /\.(?:js|mjs|wasm|json|png|jpg|jpeg|gif|webp|svg|ico|ttf|otf|woff2?)$/i.test(pathname)
   );
+}
+
+function isVersionCriticalAsset(pathname) {
+  return (
+    pathname.endsWith('/flutter_bootstrap.js') ||
+    pathname.endsWith('/main.dart.js') ||
+    pathname.endsWith('/flutter.js') ||
+    pathname.endsWith('/assets/AssetManifest.bin') ||
+    pathname.endsWith('/assets/AssetManifest.bin.json') ||
+    pathname.endsWith('/assets/AssetManifest.json') ||
+    pathname.endsWith('/assets/FontManifest.json')
+  );
+}
+
+async function networkFirstVersionedAsset(request) {
+  const cache = await caches.open(RUNTIME_CACHE);
+
+  try {
+    const response = await fetch(request, {cache: 'no-store'});
+    if (response.ok) {
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cachedResponse = await cache.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    throw error;
+  }
 }
 
 async function handleNavigation(request) {

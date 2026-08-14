@@ -19,7 +19,7 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="application-name" content="worCat Work Calendar">
-  <meta name="worcat:version" content="v1.2.117+125">
+  <meta name="worcat:version" content="v1.2.118+126">
   <meta name="worcat:updated-at" content="2026-08-14">
   <meta
     name="description"
@@ -287,6 +287,58 @@
       document.addEventListener('touchcancel', clearEdgeTouch, { passive: true, capture: true });
     })();
   </script>
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    (async () => {
+      const appVersion =
+        document.querySelector('meta[name="worcat:' + 'version"]')?.content?.trim() ||
+        'v0.0.0+0';
+
+      // Activate the matching worker before Flutter requests main.dart.js.
+      // This prevents an older worker from serving the previous app bundle
+      // during the first launch immediately after a deployment.
+      if ('serviceWorker' in navigator) {
+        try {
+          window.worcatBootScreen?.setStatus(
+            '\u6b63\u5728\u540c\u6b65\u6700\u65b0\u7248\u672c\uff0c\u8acb\u7a0d\u7b49\u55b5~',
+          );
+          const workerUrl = new URL('app_service_worker.js', document.baseURI);
+          workerUrl.searchParams.set('v', appVersion);
+          const registration = await navigator.serviceWorker.register(
+            workerUrl.toString(),
+            { updateViaCache: 'none' },
+          );
+
+          try {
+            await registration.update();
+          } catch (_) {
+            // The install started by register() may already be in progress.
+          }
+
+          const deadline = Date.now() + 5000;
+          while (Date.now() < deadline) {
+            const activeUrl = registration.active?.scriptURL
+              ? new URL(registration.active.scriptURL)
+              : null;
+            if (
+              registration.active?.state === 'activated' &&
+              activeUrl?.searchParams.get('v') === appVersion
+            ) {
+              break;
+            }
+            await new Promise((resolve) => window.setTimeout(resolve, 50));
+          }
+        } catch (error) {
+          console.debug('Service worker startup sync skipped.', error);
+        }
+      }
+
+      const bootstrapUrl = new URL('flutter_bootstrap.js', document.baseURI);
+      bootstrapUrl.searchParams.set('v', appVersion);
+      const bootstrapScript = document.createElement('script');
+      bootstrapScript.src = bootstrapUrl.toString();
+      bootstrapScript.async = true;
+      document.body.appendChild(bootstrapScript);
+    })();
+  </script>
 </body>
 </html>

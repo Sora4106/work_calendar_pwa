@@ -331,6 +331,9 @@ function setRuntimeMetadata() {
   document.documentElement.dataset.appUpdatedAt = APP_UPDATED_AT;
   window.__WORCAT_APP_VERSION__ = APP_VERSION_LABEL;
   window.worcatBootScreen?.setVersion(APP_VERSION_LABEL);
+}
+
+function markRuntimeReady() {
   if (readSessionValue(UPDATE_TARGET_SESSION_KEY) === APP_VERSION_LABEL) {
     removeSessionValue(UPDATE_TARGET_SESSION_KEY);
   }
@@ -437,26 +440,6 @@ async function clearWorcatCaches() {
   );
 }
 
-async function unregisterWorcatServiceWorkers() {
-  if (!('serviceWorker' in navigator)) {
-    return;
-  }
-
-  const currentOrigin = window.location.origin;
-  const registrations = await navigator.serviceWorker.getRegistrations();
-  await Promise.all(
-    registrations
-      .filter((registration) => {
-        try {
-          return new URL(registration.scope).origin === currentOrigin;
-        } catch (_) {
-          return false;
-        }
-      })
-      .map((registration) => registration.unregister()),
-  );
-}
-
 function queueReload(message, targetVersion = null) {
   if (
     reloadQueued ||
@@ -493,7 +476,6 @@ async function queueFreshReload(message, targetVersion) {
   toast.hidden = false;
 
   try {
-    await unregisterWorcatServiceWorkers();
     await clearWorcatCaches();
   } catch (error) {
     console.debug('Failed to clear old worCat cache before reload.', error);
@@ -980,7 +962,7 @@ function armAnimatedCursorBootstrap() {
 
 async function checkVersionManifest() {
   if (reloadQueued) {
-    return;
+    return true;
   }
 
   const versionUrl = resolveAppUrl(`version.json?ts=${Date.now()}`);
@@ -992,7 +974,7 @@ async function checkVersionManifest() {
   });
 
   if (!response.ok) {
-    return;
+    return false;
   }
 
   const payload = await response.json();
@@ -1003,7 +985,7 @@ async function checkVersionManifest() {
       : null);
 
   if (!remoteLabel) {
-    return;
+    return false;
   }
 
   const comparison = compareVersionLabels(remoteLabel, APP_VERSION_LABEL);
@@ -1012,7 +994,10 @@ async function checkVersionManifest() {
       `New version ${remoteLabel} detected. Refreshing workspace...`,
       remoteLabel,
     );
+    return true;
   }
+
+  return false;
 }
 
 async function registerServiceWorker() {
@@ -1070,11 +1055,18 @@ function runStartupUpdateCheck(registration) {
 
 setRuntimeMetadata();
 setBootStatus('\u6b63\u5728\u6aa2\u67e5\u66f4\u65b0\uff0c\u6e96\u5099 worCat \u5de5\u4f5c\u6aaf...');
-void checkVersionManifest().catch((error) => {
-  console.debug('Version check skipped.', error);
-});
 
 (async function bootstrap() {
+  try {
+    await checkVersionManifest();
+  } catch (error) {
+    console.debug('Version check skipped.', error);
+  }
+
+  if (reloadQueued) {
+    return;
+  }
+
   const registrationPromise = registerServiceWorker();
 
   _flutter.loader.load({
@@ -1082,6 +1074,7 @@ void checkVersionManifest().catch((error) => {
       setBootStatus('\u6b63\u5728\u555f\u52d5 worCat \u7cfb\u7d71...');
       const appRunner = await engineInitializer.initializeEngine();
       await appRunner.runApp();
+      markRuntimeReady();
       window.worcatBootScreen?.complete();
 
       const registration = await registrationPromise;
