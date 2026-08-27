@@ -1,0 +1,13 @@
+{
+  "format": "worcat-android-update-v1",
+  "versionName": "1.2.125",
+  "buildNumber": 133,
+  "downloadUrl": "https://drive.google.com/file/d/1ILB4E8E67SKGzW0bXUupvJD3Xzbou6Z_/view?usp=sharing",
+  "publishedAt": "2026-08-27",
+  "notesZh": [
+    "\u52a0\u5165 Android \u539f\u751f\u901a\u77e5\u3001\u8a9e\u97f3\u8f38\u5165\u8207\u7248\u672c\u66f4\u65b0\u63d0\u9192\u3002"
+  ],
+  "notesEn": [
+    "Added Android notifications, speech input, and update reminders."
+  ]
+}
