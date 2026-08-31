@@ -1,13 +1,15 @@
 {
   "format": "worcat-android-update-v1",
-  "versionName": "1.2.129",
-  "buildNumber": 137,
+  "versionName": "1.2.131",
+  "buildNumber": 139,
   "downloadUrl": "https://drive.google.com/file/d/1ILB4E8E67SKGzW0bXUupvJD3Xzbou6Z_/view?usp=sharing",
-  "publishedAt": "2026-08-28",
+  "publishedAt": "2026-08-31",
   "notesZh": [
-    "\u6539\u5584\u65e5\u671f\u8f38\u5165\u3001\u8a9e\u97f3\u89e3\u6790\u8207 Android \u8c93\u54aa\u63d0\u9192\u3002"
+    "\u65b0\u589e\u8cc7\u8a0a\u5361\u5c0e\u89bd\u3001\u56db\u9801\u9996\u6b21\u63a2\u7167\u71c8\u6559\u5b78\u8207\u81ea\u8a02\u5c0f\u55b5\u624b\u4ecb\u7d39\u3002",
+    "\u8a18\u5e33\u74b0\u5f62\u5716\u63db\u6210\u65b0\u8c93\u54aa\u5716\u6848\uff0c\u6703\u4f9d\u6536\u5165\u8207\u652f\u51fa\u6bd4\u4f8b\u52d5\u614b\u8b8a\u8272\u3002"
   ],
   "notesEn": [
-    "Improved date entry, speech parsing, and Android cat reminders."
+    "Added card navigation, four-page first-use spotlight tours, and custom assistant introductions.",
+    "The ledger donut chart now uses new cat artwork with an animated income and expense ring."
   ]
 }
