@@ -23,8 +23,8 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
   <meta name="application-name" content="worCat Work Calendar">
-  <meta name="worcat:version" content="v1.2.129+137">
-  <meta name="worcat:updated-at" content="2026-08-28">
+  <meta name="worcat:version" content="v1.2.130+138">
+  <meta name="worcat:updated-at" content="2026-08-31">
   <meta
     name="description"
     content="worCat Work Calendar is a Web PWA for calendar planning, ledger entries, schedules, and work tracking."
@@ -385,7 +385,13 @@
 </head>
 <body>
   <main id="worcat-boot-screen" aria-busy="true" aria-live="polite">
-    <section id="worcat-brand-stage" class="worcat-boot-stage worcat-brand-stage" aria-label="worCat">
+    <section
+      id="worcat-brand-stage"
+      class="worcat-boot-stage worcat-brand-stage"
+      role="button"
+      tabindex="0"
+      aria-label="worCat，點擊可跳過啟動畫面"
+    >
       <img
         class="worcat-boot-cat worcat-boot-cat--orange"
         src="assets/assets/cats/clean/breed_orange_tabby.png"
@@ -444,11 +450,35 @@
       const updateStage = document.getElementById('worcat-update-stage');
       const bootMessage = document.getElementById('worcat-boot-message');
       const bootVersion = document.getElementById('worcat-boot-version');
-      const bootStartedAt = Date.now();
-      const brandVisibleMs = 650;
+      const brandVisibleMs = 5000;
       const stageTransitionMs = 220;
       const minimumUpdateVisibleMs = 420;
       let updateStageStartedAt = null;
+      let completionRequested = false;
+      let completionScheduled = false;
+
+      const scheduleBootCompletion = () => {
+        if (
+          !completionRequested ||
+          completionScheduled ||
+          updateStageStartedAt === null ||
+          !bootScreen ||
+          bootScreen.classList.contains('is-ready')
+        ) {
+          return;
+        }
+
+        completionScheduled = true;
+        const earliestCompletion = Math.max(
+          updateStageStartedAt + stageTransitionMs,
+          updateStageStartedAt + minimumUpdateVisibleMs,
+        );
+        const remainingDelay = Math.max(0, earliestCompletion - Date.now());
+        window.setTimeout(() => {
+          bootScreen.classList.add('is-ready');
+          window.setTimeout(() => bootScreen.remove(), 300);
+        }, remainingDelay);
+      };
 
       const showUpdateStage = () => {
         if (updateStageStartedAt !== null) {
@@ -459,9 +489,17 @@
         brandStage?.setAttribute('aria-hidden', 'true');
         updateStage?.classList.add('is-visible');
         updateStage?.setAttribute('aria-hidden', 'false');
+        scheduleBootCompletion();
       };
 
       window.setTimeout(showUpdateStage, brandVisibleMs);
+      brandStage?.addEventListener('click', showUpdateStage);
+      brandStage?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          showUpdateStage();
+        }
+      });
 
       window.worcatBootScreen = {
         setStatus(message) {
@@ -475,22 +513,15 @@
           }
         },
         complete() {
-          if (!bootScreen || bootScreen.classList.contains('is-ready')) {
+          if (
+            completionRequested ||
+            !bootScreen ||
+            bootScreen.classList.contains('is-ready')
+          ) {
             return;
           }
-          showUpdateStage();
-          const earliestCompletion = Math.max(
-            bootStartedAt + brandVisibleMs + stageTransitionMs,
-            (updateStageStartedAt ?? Date.now()) + minimumUpdateVisibleMs,
-          );
-          const remainingDelay = Math.max(
-            0,
-            earliestCompletion - Date.now(),
-          );
-          window.setTimeout(() => {
-            bootScreen.classList.add('is-ready');
-            window.setTimeout(() => bootScreen.remove(), 300);
-          }, remainingDelay);
+          completionRequested = true;
+          scheduleBootCompletion();
         },
       };
 
