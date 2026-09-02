@@ -1,15 +1,17 @@
 {
   "format": "worcat-android-update-v1",
-  "versionName": "1.2.133",
-  "buildNumber": 141,
+  "versionName": "1.2.134",
+  "buildNumber": 142,
   "downloadUrl": "https://drive.google.com/file/d/1ILB4E8E67SKGzW0bXUupvJD3Xzbou6Z_/view?usp=sharing",
-  "publishedAt": "2026-08-31",
+  "publishedAt": "2026-09-02",
   "notesZh": [
-    "\u6536\u5165\u8a18\u9304\u7684\u4ed8\u6b3e\u65b9\u5f0f\u6b04\u4f4d\u6539\u7a31\u5165\u5e33\u65b9\u5f0f\uff0c\u8b93\u85aa\u8cc7\u8207\u5176\u4ed6\u6536\u5165\u7684\u8a9e\u610f\u66f4\u6e05\u695a\u3002",
-    "\u5c0f\u55b5\u624b\u9810\u89bd\u3001\u9010\u9805\u8f38\u5165\u8207\u624b\u52d5\u65b0\u589e\u90fd\u6703\u4f9d\u6536\u652f\u985e\u578b\u986f\u793a\u6b63\u78ba\u6b04\u4f4d\u540d\u7a31\u3002"
+    "\u6539\u5584 Android APK \u5728\u90e8\u5206\u624b\u6a5f\u8207\u6a21\u64ec\u5668\u4e0a\u7684\u5b89\u88dd\u76f8\u5bb9\u6027\u3002",
+    "\u4fee\u6b63\u884c\u7a0b\u8207\u5de5\u4f5c\u8cc7\u8a0a\u5361\u6578\u91cf\u6587\u5b57\u7684 Android \u767d\u8272\u6b98\u5f71\u3002",
+    "\u88dc\u9f4a\u63d0\u9192\u6717\u8b80\u98a8\u683c\u7684\u7e41\u9ad4\u4e2d\u6587\u8207\u82f1\u6587\u6a19\u7c64\u3002"
   ],
   "notesEn": [
-    "Income records now label the payment field as Deposit method for clearer salary and income semantics.",
-    "Quick capture previews, guided entry, and manual entry now show the field label that matches the ledger type."
+    "Improved Android APK installation compatibility on more phones and emulators.",
+    "Fixed white text ghosting in schedule and work summary counts on Android.",
+    "Completed Traditional Chinese and English labels for reminder voice styles."
   ]
 }

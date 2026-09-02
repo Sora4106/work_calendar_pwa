@@ -1,11 +1,11 @@
 'use strict';
 
-const APP_VERSION = 'v1.2.133+141';
+const APP_VERSION = 'v1.2.135+143';
 const STATIC_CACHE = `worcat-static-${APP_VERSION}`;
 const RUNTIME_CACHE = `worcat-runtime-${APP_VERSION}`;
 // Keep cat artwork between app-only releases. Bump this only when an image
 // under assets/cats is replaced so unchanged artwork never downloads again.
-const CAT_ASSET_REVISION = '2026-08-31-donut-v4';
+const CAT_ASSET_REVISION = '2026-09-02-cashflow-sprites-v1';
 const CAT_IMAGE_CACHE = 'worcat-cat-images';
 const CACHE_PREFIX = 'worcat-';
 const BASE_URL = self.registration.scope;
