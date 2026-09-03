@@ -1,17 +1,17 @@
 {
   "format": "worcat-android-update-v1",
-  "versionName": "1.2.134",
-  "buildNumber": 142,
+  "versionName": "1.2.137",
+  "buildNumber": 145,
   "downloadUrl": "https://drive.google.com/file/d/1ILB4E8E67SKGzW0bXUupvJD3Xzbou6Z_/view?usp=sharing",
-  "publishedAt": "2026-09-02",
+  "publishedAt": "2026-09-03",
   "notesZh": [
-    "\u6539\u5584 Android APK \u5728\u90e8\u5206\u624b\u6a5f\u8207\u6a21\u64ec\u5668\u4e0a\u7684\u5b89\u88dd\u76f8\u5bb9\u6027\u3002",
-    "\u4fee\u6b63\u884c\u7a0b\u8207\u5de5\u4f5c\u8cc7\u8a0a\u5361\u6578\u91cf\u6587\u5b57\u7684 Android \u767d\u8272\u6b98\u5f71\u3002",
-    "\u88dc\u9f4a\u63d0\u9192\u6717\u8b80\u98a8\u683c\u7684\u7e41\u9ad4\u4e2d\u6587\u8207\u82f1\u6587\u6a19\u7c64\u3002"
+    "\u6539\u5584\u624b\u6a5f\u7248\u4e09\u5927\u9801\u9762\u7684\u8c93\u54aa\u9801\u9996\u8207\u9801\u540d\u6392\u7248\u3002",
+    "\u7e2e\u5c0f\u6703\u54e1\u9078\u55ae\uff0c\u52a0\u5165\u4e0a\u4e0b\u6372\u52d5\u63d0\u793a\u8207\u7c21\u5316\u5e33\u865f\u986f\u793a\u3002",
+    "\u8abf\u6574\u6536\u652f\u8c93\u54aa\u5716\u8868\u7684\u5207\u63db\u901f\u5ea6\uff0c\u4e26\u6539\u5584\u8a9e\u97f3\u53d6\u6d88\u8207\u555f\u52d5\u9801\u9069\u61c9\u3002"
   ],
   "notesEn": [
-    "Improved Android APK installation compatibility on more phones and emulators.",
-    "Fixed white text ghosting in schedule and work summary counts on Android.",
-    "Completed Traditional Chinese and English labels for reminder voice styles."
+    "Improved the compact cat header and page-title layout across the three mobile pages.",
+    "Narrowed the account menu with scroll hints and simplified account information.",
+    "Slowed cashflow cat transitions and improved voice cancellation and startup-page scaling."
   ]
 }
