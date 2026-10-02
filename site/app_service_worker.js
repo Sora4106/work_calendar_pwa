@@ -1,11 +1,22 @@
 'use strict';
 
-const APP_VERSION = 'v1.2.148+156';
+const APP_VERSION = 'v1.2.149+157';
 const STATIC_CACHE = `worcat-static-${APP_VERSION}`;
 const RUNTIME_CACHE = `worcat-runtime-${APP_VERSION}`;
 // Keep cat artwork between app-only releases. Bump this only when an image
 // under assets/cats is replaced so unchanged artwork never downloads again.
-const CAT_ASSET_REVISION = '2026-10-02-cashflow-sprites-v2';
+const CAT_ASSET_REVISION = '2026-09-02-cashflow-sprites-v1';
+const CASHFLOW_CAT_ASSET_REVISION = '2026-10-02-cashflow-sprites-v2';
+const CASHFLOW_CAT_ASSETS = new Set([
+  'cashflow_balance_scale_sheet_20260902.png',
+  'cashflow_bar_sheet_20260902.png',
+  'cashflow_donut_icon_20260902.png',
+  'cashflow_donut_sheet_20260902.png',
+  'cashflow_food_can_sheet_20260902.png',
+  'cashflow_hidden_20260902.png',
+  'cashflow_pie_sheet_20260902.png',
+  'cashflow_savings_bank_sheet_20260902.png',
+]);
 const CAT_IMAGE_CACHE = 'worcat-cat-images';
 const CACHE_PREFIX = 'worcat-';
 const BASE_URL = self.registration.scope;
@@ -244,7 +255,11 @@ async function staleWhileRevalidate(request) {
 
 function catImageCacheRequest(request) {
   const keyUrl = new URL(request.url);
-  keyUrl.searchParams.set('__worcat_cat_rev', CAT_ASSET_REVISION);
+  const assetName = keyUrl.pathname.split('/').pop() || '';
+  const revision = CASHFLOW_CAT_ASSETS.has(assetName)
+    ? CASHFLOW_CAT_ASSET_REVISION
+    : CAT_ASSET_REVISION;
+  keyUrl.searchParams.set('__worcat_cat_rev', revision);
   return new Request(keyUrl.toString());
 }
 
