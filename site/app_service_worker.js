@@ -1,21 +1,21 @@
 'use strict';
 
-const APP_VERSION = 'v1.2.149+157';
+const APP_VERSION = 'v1.2.150+158';
 const STATIC_CACHE = `worcat-static-${APP_VERSION}`;
 const RUNTIME_CACHE = `worcat-runtime-${APP_VERSION}`;
 // Keep cat artwork between app-only releases. Bump this only when an image
 // under assets/cats is replaced so unchanged artwork never downloads again.
-const CAT_ASSET_REVISION = '2026-09-02-cashflow-sprites-v1';
-const CASHFLOW_CAT_ASSET_REVISION = '2026-10-02-cashflow-sprites-v2';
+const CAT_ASSET_REVISION = '2026-10-05-startup-webp-v1';
+const CASHFLOW_CAT_ASSET_REVISION = '2026-10-02-cashflow-sprites-webp-v1';
 const CASHFLOW_CAT_ASSETS = new Set([
-  'cashflow_balance_scale_sheet_20260902.png',
-  'cashflow_bar_sheet_20260902.png',
+  'cashflow_balance_scale_sheet_20260902.webp',
+  'cashflow_bar_sheet_20260902.webp',
   'cashflow_donut_icon_20260902.png',
-  'cashflow_donut_sheet_20260902.png',
-  'cashflow_food_can_sheet_20260902.png',
+  'cashflow_donut_sheet_20260902.webp',
+  'cashflow_food_can_sheet_20260902.webp',
   'cashflow_hidden_20260902.png',
-  'cashflow_pie_sheet_20260902.png',
-  'cashflow_savings_bank_sheet_20260902.png',
+  'cashflow_pie_sheet_20260902.webp',
+  'cashflow_savings_bank_sheet_20260902.webp',
 ]);
 const CAT_IMAGE_CACHE = 'worcat-cat-images';
 const CACHE_PREFIX = 'worcat-';
