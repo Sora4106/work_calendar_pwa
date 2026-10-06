@@ -1075,7 +1075,10 @@ setBootStatus('\u6b63\u5728\u6aa2\u67e5\u66f4\u65b0\uff0c\u6e96\u5099 worCat \u5
       const appRunner = await engineInitializer.initializeEngine();
       await appRunner.runApp();
       markRuntimeReady();
-      window.worcatBootScreen?.complete();
+      // Flutter dismisses the native page after its first visible frame.
+      // Keeping this screen during the handoff prevents a white flash.
+      setBootStatus('\u6b63\u5728\u540c\u6b65\u6703\u54e1\u8cc7\u6599...');
+      window.setTimeout(() => window.worcatBootScreen?.complete(), 30000);
 
       const registration = await registrationPromise;
       scheduleDeferredTask(() => runStartupUpdateCheck(registration), 120);
