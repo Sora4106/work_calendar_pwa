@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = 'v1.2.154+162';
+const APP_VERSION = 'v1.2.155+163';
 const STATIC_CACHE = `worcat-static-${APP_VERSION}`;
 const RUNTIME_CACHE = `worcat-runtime-${APP_VERSION}`;
 // Keep cat artwork between app-only releases. Bump this only when an image
@@ -129,12 +129,12 @@ self.addEventListener('push', (event) => {
         payload = event.data?.json() ?? {};
       } catch (_) {
         payload = {
-          title: 'worCat 提醒',
+          title: 'worCat ???',
           body: event.data?.text?.() ?? '',
         };
       }
 
-      const title = payload.title || 'worCat 提醒';
+      const title = payload.title || 'worCat ???';
       const body = payload.body || '';
       const targetUrl =
         payload.url || new URL('.', BASE_URL).toString();
